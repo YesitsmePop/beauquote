@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // write build output to a different folder to avoid permission issues on some systems
-  distDir: '.next_build',
+  // use Next's default output directory so Vercel can find routes-manifest.json
   eslint: {
     ignoreDuringBuilds: true,
   },
