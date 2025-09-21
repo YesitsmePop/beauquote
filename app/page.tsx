@@ -216,7 +216,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen relative overflow-hidden glass-background">
-      <ThreeBackground />
+      {/* hide heavy 3D background on small screens for performance */}
+      <div className="hidden sm:block">
+        <ThreeBackground />
+      </div>
 
       <div className="relative z-10 min-h-screen flex flex-col">
         <header className="p-6">
@@ -299,34 +302,37 @@ export default function Home() {
                 <Card className="glass-strong p-6">
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-center gradient-text">Your Decode:</h3>
-                    <div className="flex flex-wrap gap-4 justify-center items-center">
-                      {currentQuote.original.split(" ").map((word, wordIndex) => (
-                        <div key={wordIndex} className="word-group">
-                          {Array.from(word).map((letter, letterIndex) => (
-                                <Input
-                                  key={letterIndex}
-                                  ref={(el) => {
-                                    if (!inputRefs.current[wordIndex]) inputRefs.current[wordIndex] = []
-                                    inputRefs.current[wordIndex][letterIndex] = el
-                                  }}
-                                  value={userInput[wordIndex]?.[letterIndex] || ""}
-                                  onChange={(e) => handleInputChange(wordIndex, letterIndex, e.target.value)}
-                                  onKeyDown={(e) => handleKeyDown(wordIndex, letterIndex, e)}
-                                  className={`w-10 h-12 text-center font-mono text-lg glass border-primary/30 focus:border-primary focus:glow ${
-                                    hasChecked && validationStates[wordIndex]?.[letterIndex]
-                                      ? validationStates[wordIndex][letterIndex]
-                                      : ""
-                                  }`}
-                                  placeholder="_"
-                                  maxLength={1}
-                                />
-                              ))}
-                          {/* Add space between words */}
-                          {wordIndex < currentQuote.original.split(" ").length - 1 && (
-                            <div className="word-separator" />
-                          )}
-                        </div>
-                      ))}
+                    <div className="flex flex-wrap gap-3 justify-center items-center">
+                      {currentQuote.original.split(" ").map((word, wordIndex) => {
+                        const isLong = word.length >= 8
+                        return (
+                          <div key={wordIndex} className={`word-group ${isLong ? 'flex flex-wrap justify-center gap-1' : ''}`}>
+                            {Array.from(word).map((letter, letterIndex) => (
+                              <Input
+                                key={letterIndex}
+                                ref={(el) => {
+                                  if (!inputRefs.current[wordIndex]) inputRefs.current[wordIndex] = []
+                                  inputRefs.current[wordIndex][letterIndex] = el
+                                }}
+                                value={userInput[wordIndex]?.[letterIndex] || ""}
+                                onChange={(e) => handleInputChange(wordIndex, letterIndex, e.target.value)}
+                                onKeyDown={(e) => handleKeyDown(wordIndex, letterIndex, e)}
+                                className={`${isLong ? 'w-7 h-10 sm:w-8 sm:h-10 md:w-10 md:h-12' : 'w-8 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14'} text-center font-mono text-lg glass border-primary/30 focus:border-primary focus:glow ${
+                                  hasChecked && validationStates[wordIndex]?.[letterIndex]
+                                    ? validationStates[wordIndex][letterIndex]
+                                    : ""
+                                }`}
+                                placeholder="_"
+                                maxLength={1}
+                              />
+                            ))}
+                            {/* Add space between words */}
+                            {wordIndex < currentQuote.original.split(" ").length - 1 && (
+                              <div className="word-separator" />
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 </Card>
@@ -335,7 +341,7 @@ export default function Home() {
                   <div className="flex justify-center">
                     <Button
                       onClick={checkAnswer}
-                      className="gradient-secondary glow hover:glow-strong font-semibold px-8 py-3 cursor-pointer shimmer-button"
+                      className="gradient-secondary glow hover:glow-strong font-semibold px-8 py-3 cursor-pointer shimmer-button w-full sm:w-auto max-w-xs"
                     >
                       Check Answer
                     </Button>
@@ -404,20 +410,20 @@ export default function Home() {
                       <p className="text-lg">The quote was:</p>
                       <p className="text-lg font-mono">"{currentQuote.original}"</p>
                       <p className="text-muted-foreground">— {currentQuote.author}</p>
-                      <div className="flex gap-4 justify-center">
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <Button
                           onClick={async () => {
                             setGaveUp(false)
                             await startGame()
                           }}
-                          className="gradient-primary glow cursor-pointer shimmer-button"
+                          className="gradient-primary glow cursor-pointer shimmer-button w-full sm:w-auto"
                         >
                           Next Quote
                         </Button>
                         <Button
                           onClick={resetGame}
                           variant="outline"
-                          className="glass bg-transparent border-primary/50 cursor-pointer shimmer-button"
+                          className="glass bg-transparent border-primary/50 cursor-pointer shimmer-button w-full sm:w-auto"
                         >
                           Main Menu
                         </Button>
